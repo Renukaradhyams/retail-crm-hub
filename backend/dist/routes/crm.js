@@ -9,6 +9,17 @@ const db_1 = require("../config/db");
 const auth_1 = require("../middleware/auth");
 const ist_1 = require("../lib/ist");
 const router = (0, express_1.Router)();
+// ─── PIN VERIFICATION (public, no JWT required) ──────────────────────────────
+router.post('/verify-pin', async (req, res) => {
+    const { kind, pin } = req.body;
+    if (!kind || !pin) {
+        res.status(400).json({ error: 'kind and pin required' });
+        return;
+    }
+    const col = kind === 'tv' ? 'tv_pin' : kind === 'cash' ? 'cash_pin' : 'greeter_pin';
+    const row = await (0, db_1.query)(`SELECT ${col} AS pin FROM settings WHERE id = 1`).then(r => r[0]);
+    res.json({ valid: row?.pin === String(pin) });
+});
 router.use(auth_1.authenticateJWT);
 // ─── SETTINGS ───────────────────────────────────────────────────────────────
 router.get('/settings', async (_req, res) => {

@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   Footprints,
@@ -16,9 +16,9 @@ import {
   CalendarClock,
   X,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { canAccess, type AppRole, type PageKey } from "@/lib/crm";
 import { cn } from "@/lib/utils";
-import api from "@/lib/api";
 
 type NavItem = {
   to: string;
@@ -76,24 +76,19 @@ export function CrmSidebar({
   open: boolean;
   onClose: () => void;
 }) {
-  const location = useLocation();
-  const pathname = location.pathname;
-  const [openDiverts, setOpenDiverts] = useState(0);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  useEffect(() => {
-    let cancelled = false;
-    async function fetchDiverts() {
-      try {
-        const res = await api.get("/crm/diverts?status=open&limit=1");
-        if (!cancelled) setOpenDiverts(res.data?.total ?? 0);
-      } catch {
-        // ignore
-      }
-    }
-    fetchDiverts();
-    const id = setInterval(fetchDiverts, 60_000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, []);
+  const { data: openDiverts = 0 } = useQuery({
+    queryKey: ["divert-open-count"],
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("diverts")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["open", "sourcing"]);
+      return count ?? 0;
+    },
+  });
 
   return (
     <>

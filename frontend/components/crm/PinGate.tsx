@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import api from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,13 +10,12 @@ export type PinKind = "tv" | "cash" | "greeter";
 const storageKey = (kind: PinKind) => `bsc-pin-${kind}`;
 
 export async function verifyPin(kind: PinKind, pin: string): Promise<boolean> {
-  try {
-    const res = await api.post("/crm/verify-pin", { kind, pin });
-    return res.data?.valid === true;
-  } catch (err: any) {
-    toast.error(err?.response?.data?.error || "PIN verification failed");
+  const { data, error } = await supabase.rpc("verify_access_pin", { _kind: kind, _pin: pin });
+  if (error) {
+    toast.error(error.message);
     return false;
   }
+  return data === true;
 }
 
 /** Wraps a screen behind a shared device PIN stored in the backend. */

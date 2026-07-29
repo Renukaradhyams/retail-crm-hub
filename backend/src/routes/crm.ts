@@ -5,7 +5,18 @@ import { authenticateJWT, requireRole } from '../middleware/auth';
 import { istToday } from '../lib/ist';
 
 const router = Router();
+
+// ─── PIN VERIFICATION (public, no JWT required) ──────────────────────────────
+router.post('/verify-pin', async (req: Request, res: Response): Promise<void> => {
+  const { kind, pin } = req.body;
+  if (!kind || !pin) { res.status(400).json({ error: 'kind and pin required' }); return; }
+  const col = kind === 'tv' ? 'tv_pin' : kind === 'cash' ? 'cash_pin' : 'greeter_pin';
+  const row: any = await query(`SELECT ${col} AS pin FROM settings WHERE id = 1`).then(r => r[0]);
+  res.json({ valid: row?.pin === String(pin) });
+});
+
 router.use(authenticateJWT);
+
 
 // ─── SETTINGS ───────────────────────────────────────────────────────────────
 router.get('/settings', async (_req: Request, res: Response): Promise<void> => {
