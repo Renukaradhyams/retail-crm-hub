@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const pool = mysql.createPool({
-  host:     '127.0.0.1',
+  host:     'localhost',
   port:     parseInt(process.env.DB_PORT || '3306'),
   user:     process.env.DB_USER     || 'u510366842_retail_crm',
   password: process.env.DB_PASSWORD || 'Btpldvg@2026',
