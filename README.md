@@ -301,16 +301,6 @@ Auto-migration: initDb.ts uses ALTER TABLE ... ADD COLUMN inside try/catch so ex
 
 Role seeding: Greeter accounts are auto-created with a default PIN 1234 on first run
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/d72e8db9-d581-479c-ac9e-1962207635a0).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
